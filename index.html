@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House of Mind Games</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #061811;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Glowing Neon & Metallic Accents */
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFE082 0%, #FFB300 50%, #FF8F00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border {
+            border: 2px solid #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .card-glow:hover {
+            box-shadow: 0 10px 30px -5px rgba(0, 230, 118, 0.4), 0 0 20px 2px rgba(212, 175, 55, 0.4);
+            transform: translateY(-6px) scale(1.02);
+        }
+
+        .glass-panel {
+            background: rgba(10, 35, 26, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #040e0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1b4d3e;
+            border-radius: 5px;
+            border: 1px solid #d4af37;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #256d58;
+        }
+
+        /* Canvas background overlay */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-16">
+
+    <!-- Interactive Background Particles -->
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <!-- Header Banner Section -->
+        <header class="pt-6 pb-4">
+            <div class="glass-panel rounded-2xl p-2 sm:p-4 gold-border overflow-hidden transition-all duration-300">
+                <div class="w-full flex justify-center items-center overflow-hidden rounded-xl bg-emerald-950/50">
+                    <img 
+                        src="Header.jfif" 
+                        alt="House of Mind Games Header" 
+                        class="w-full h-auto max-h-[380px] object-contain rounded-lg shadow-2xl transition-transform duration-700 hover:scale-[1.01]"
+                        onerror="this.onerror=null; this.src='input_file_11.png';"
+                    />
+                </div>
+            </div>
+        </header>
+
+        <!-- Search & Category Navigation Bar -->
+        <section class="my-6">
+            <div class="glass-panel rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+                
+                <!-- Category Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-2 w-full md:w-auto" id="categoryFilters">
+                    <button onclick="filterCategory('all', this)" class="cat-btn active px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-amber-500 text-black shadow-lg shadow-amber-500/20 hover:bg-amber-400">
+                        <i class="fa-solid fa-gamepad mr-2"></i>All Games
+                    </button>
+                    <button onclick="filterCategory('solitaire', this)" class="cat-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 hover:bg-emerald-800/80 hover:text-white">
+                        <i class="fa-solid fa-spade mr-2"></i>Solitaire
+                    </button>
+                    <button onclick="filterCategory('puzzle', this)" class="cat-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 hover:bg-emerald-800/80 hover:text-white">
+                        <i class="fa-solid fa-puzzle-piece mr-2"></i>Puzzles & Matching
+                    </button>
+                    <button onclick="filterCategory('strategy', this)" class="cat-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 hover:bg-emerald-800/80 hover:text-white">
+                        <i class="fa-solid fa-chess mr-2"></i>Strategy
+                    </button>
+                </div>
+
+                <!-- Live Search Bar -->
+                <div class="relative w-full md:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-amber-400"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        onkeyup="searchGames()"
+                        placeholder="Search game..." 
+                        class="w-full pl-10 pr-4 py-2.5 bg-emerald-950/80 border border-amber-500/40 rounded-lg text-sm text-white placeholder-emerald-400/60 focus:outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 transition-all"
+                    />
+                </div>
+            </div>
+        </section>
+
+        <!-- Games Grid -->
+        <main>
+            <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Dynamic Game Cards render here -->
+            </div>
+
+            <!-- Empty Search Results Placeholder -->
+            <div id="noResults" class="hidden text-center py-16 glass-panel rounded-2xl my-8">
+                <i class="fa-solid fa-ghost text-5xl text-amber-400 mb-4 animate-bounce"></i>
+                <h3 class="text-xl font-bold text-white mb-2">No Games Found</h3>
+                <p class="text-emerald-300/80 text-sm">Try searching for another keyword or change your category filter.</p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center text-xs text-emerald-400/60 py-6 border-t border-emerald-900/50">
+            <p>© House of Mind Games. Play your favourite Solitaire, Strategy & Puzzle games online.</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        const games = [
+            {
+                id: 1,
+                title: "Break the Code",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/mastermind/",
+                image: "BreaktheCode.jfif",
+                fallbackImage: "input_file_0.png",
+                badge: "Decrypt Pattern",
+                rating: "4.9",
+                fallbackText: "Break The Code"
+            },
+            {
+                id: 2,
+                title: "Card Mahjong",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/mahjong/",
+                image: "CardMahjong.jfif",
+                fallbackImage: "input_file_1.png",
+                badge: "Match Cards",
+                rating: "4.8",
+                fallbackText: "Card Mahjong"
+            },
+            {
+                id: 3,
+                title: "Chase the Ace",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/chasetheace/",
+                image: "ChasetheAce.jfif",
+                fallbackImage: "input_file_2.png",
+                badge: "Dodge the King",
+                rating: "4.7",
+                fallbackText: "Chase The Ace"
+            },
+            {
+                id: 4,
+                title: "Chess & Draughts",
+                category: "strategy",
+                url: "https://lst-2k.github.io/chessgame/",
+                image: "ChessDraughts.jfif",
+                fallbackImage: "input_file_3.png",
+                badge: "Strategy Battle",
+                rating: "5.0",
+                fallbackText: "Chess & Draughts"
+            },
+            {
+                id: 5,
+                title: "Clock Solitaire",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/tablesolitaire/",
+                image: "Clock.jfif",
+                fallbackImage: "input_file_4.png",
+                badge: "Temple of Time",
+                rating: "4.6",
+                fallbackText: "Clock Solitaire"
+            },
+            {
+                id: 6,
+                title: "Fruit Mahjong",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/mahjong/",
+                image: "FruitMahjong.jfif",
+                fallbackImage: "input_file_1.png",
+                badge: "Match Fruits",
+                rating: "4.8",
+                fallbackText: "Card Mahjong"
+            },
+            {
+                id: 7,
+                title: "FreeCell Solitaire",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/tablesolitaire/",
+                image: "FreeCell.jfif",
+                fallbackImage: "input_file_6.png",
+                badge: "Classic Solitaire",
+                rating: "4.9",
+                fallbackText: "FreeCell Solitaire"
+            },
+            {
+                id: 8,
+                title: "Marble Solitaire",
+                category: "strategy",
+                url: "https://lst-2k.github.io/marblesolitaire/",
+                image: "MarbleSolitaire.jfif",
+                fallbackImage: "input_file_7.png",
+                badge: "6 Boards",
+                rating: "4.8",
+                fallbackText: "Marble Solitaire"
+            },
+            {
+                id: 9,
+                title: "Monte Carlo Solitaire",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/tablesolitaire/",
+                image: "MonteCarlo.jfif",
+                fallbackImage: "input_file_8.png",
+                badge: "Challenge Odds",
+                rating: "4.7",
+                fallbackText: "Monte Carlo"
+            },
+            {
+                id: 10,
+                title: "Pocket Match",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/pocketmatch/",
+                image: "PocketMatch.jfif",
+                fallbackImage: "input_file_9.png",
+                badge: "Arcade Match",
+                rating: "4.9",
+                fallbackText: "Pocket Match"
+            },
+            {
+                id: 11,
+                title: "Klondike Solitaire",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/tablesolitaire/",
+                image: "Klondike.jfif",
+                fallbackImage: "input_file_6.png",
+                badge: "Classic favourite",
+                rating: "4.9",
+                fallbackText: "Klondike"
+            },
+            {
+                id: 12,
+                title: "Pyramid Solitaire",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/tablesolitaire/",
+                image: "Pyramid.jfif",
+                fallbackImage: "input_file_4.png",
+                badge: "Pair to 13",
+                rating: "4.8",
+                fallbackText: "Pyramid Solitaire"
+            },
+            {
+                id: 13,
+                title: "Spider Solitaire",
+                category: "solitaire",
+                url: "https://lst-2k.github.io/tablesolitaire/",
+                image: "Spider.jfif",
+                fallbackImage: "input_file_1.png",
+                badge: "8 Suits Challenge",
+                rating: "4.9",
+                fallbackText: "Spider Solitaire"
+            },
+            {
+                id: 14,
+                title: "Gem Match",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/gemmatch/",
+                image: "GemMatch.jfif",
+                fallbackImage: "input_file_5.png",
+                badge: "Jewel Quest",
+                rating: "4.8",
+                fallbackText: "Gem Match"
+            },
+            {
+                id: 15,
+                title: "Tile Slide",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/tileslide/",
+                image: "TileSlide.jfif",
+                fallbackImage: "input_file_0.png",
+                badge: "Rope Slider",
+                rating: "4.7",
+                fallbackText: "Tile Slide"
+            },
+			{
+                id: 16,
+                title: "Colour Match",
+                category: "puzzle",
+                url: "https://lst-2k.github.io/colourmatch/",
+                image: "ColourMatch.jfif",
+                fallbackImage: "input_file_5.png",
+                badge: "Match Shapes",
+                rating: "4.9",
+                fallbackText: "Colour Match"
+            },
+			{
+                id: 17,
+                title: "Roll the Dice",
+                category: "strategy",
+                url: "https://lst-2k.github.io/dicegames/",
+                image: "RolltheDice.jfif",
+                fallbackImage: "input_file_1.png",
+                badge: "Dice Roll",
+                rating: "4.8",
+                fallbackText: "RolltheDice"
+            },
+			{
+                id: 17,
+                title: "Shut the Box",
+                category: "strategy",
+                url: "https://lst-2k.github.io/dicegames/",
+                image: "ShuttheBox.jfif",
+                fallbackImage: "input_file_1.png",
+                badge: "Dice Roll",
+                rating: "4.8",
+                fallbackText: "ShuttheBox"
+            },
+			{
+                id: 18,
+                title: "Mancala",
+                category: "strategy",
+                url: "https://lst-2k.github.io/mancala/",
+                image: "mancala.jfif",
+                fallbackImage: "input_file_1.png",
+                badge: "Classic favourite",
+                rating: "4.8",
+                fallbackText: "Mancala"
+            },
+        ];
+
+        let currentCategory = 'all';
+
+        function renderGames(gamesToRender) {
+            const grid = document.getElementById('gamesGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (gamesToRender.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+
+            grid.innerHTML = gamesToRender.map(game => `
+                <a href="${game.url}" target="_blank" rel="noopener noreferrer" 
+                   class="group glass-panel rounded-xl overflow-hidden gold-border card-glow transition-all duration-300 flex flex-col justify-between">
+                    
+                    <!-- Clean Thumbnail Container -->
+                    <div class="relative w-full aspect-[16/9] overflow-hidden bg-emerald-950/90">
+                        <img 
+                            src="${game.image}" 
+                            alt="${game.title}"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onerror="this.onerror=null; this.src='${game.fallbackImage}';"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity"></div>
+                    </div>
+
+                    <!-- Details Section -->
+                    <div class="p-4 flex flex-col justify-between flex-grow">
+                        <div>
+                            <!-- Title & Star Rating -->
+                            <div class="flex items-center justify-between mb-2">
+                                <h3 class="font-bold text-lg text-white group-hover:text-amber-400 transition-colors line-clamp-1">
+                                    ${game.title}
+                                </h3>
+                                <div class="flex items-center text-amber-400 text-xs font-semibold">
+                                    <i class="fa-solid fa-star mr-1 text-amber-400"></i>${game.rating}
+                                </div>
+                            </div>
+
+                            <!-- Category & Badge Line (Side-by-side above Play Now button) -->
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-xs text-emerald-300/80 capitalize flex items-center">
+                                    <i class="fa-solid fa-tag mr-1.5 text-amber-500/80"></i>${game.category}
+                                </span>
+                                <span class="bg-black/60 text-amber-400 text-[11px] font-bold px-2.5 py-0.5 rounded-md border border-amber-500/40 shadow-sm">
+                                    ${game.badge}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button class="w-full py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-black font-bold text-xs uppercase tracking-wider rounded-lg shadow-md group-hover:from-amber-400 group-hover:to-amber-500 transition-all flex items-center justify-center">
+                            Play Now <i class="fa-solid fa-circle-play ml-2 text-sm"></i>
+                        </button>
+                    </div>
+                </a>
+            `).join('');
+        }
+
+        function filterCategory(category, btnElement) {
+            currentCategory = category;
+            
+            document.querySelectorAll('.cat-btn').forEach(btn => {
+                btn.className = "cat-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 hover:bg-emerald-800/80 hover:text-white";
+            });
+            btnElement.className = "cat-btn active px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-amber-500 text-black shadow-lg shadow-amber-500/20 hover:bg-amber-400";
+
+            applyFilters();
+        }
+
+        function searchGames() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+            const filtered = games.filter(game => {
+                const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
+                const matchesSearch = game.title.toLowerCase().includes(searchTerm) || game.badge.toLowerCase().includes(searchTerm);
+                return matchesCategory && matchesSearch;
+            });
+
+            renderGames(filtered);
+        }
+
+        // Background Particles
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.color = Math.random() > 0.5 ? 'rgba(212, 175, 55, ' : 'rgba(0, 230, 118, ';
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+            }
+
+            draw() {
+                ctx.fillStyle = this.color + this.opacity + ')';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.floor((canvas.width * canvas.height) / 18000);
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+
+        window.onload = () => {
+            resizeCanvas();
+            initParticles();
+            animateParticles();
+            renderGames(games);
+        };
+    </script>
+</body>
+</html>
