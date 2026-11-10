@@ -113,6 +113,9 @@
 					<button onclick="filterCategory('strategy', this)" class="cat-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 hover:bg-emerald-800/80 hover:text-white">
 						<i class="fa-solid fa-chess mr-2"></i>Strategy
 					</button>
+					<button onclick="filterCategory('online', this)" class="cat-btn px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 bg-emerald-900/60 text-emerald-200 border border-emerald-700/50 hover:bg-emerald-800/80 hover:text-white">
+						<i class="fa-solid fa-globe mr-2"></i>Online Multiplayer
+					</button>
 				</div>
 
                 <!-- Live Search Bar -->
@@ -144,9 +147,12 @@
         </main>
 
         <!-- Footer -->
-        <footer class="mt-16 text-center text-xs text-emerald-400/60 py-6 border-t border-emerald-900/50">
-            <p>© House of Mind Games. Play your favourite Solitaire, Strategy & Puzzle games online.</p>
-        </footer>
+		<footer class="mt-16 text-center text-xs text-emerald-400/60 py-6 border-t border-emerald-900/50 flex flex-col items-center gap-2">
+			<p>© House of Mind Games. Play your favorite Solitaire, Strategy & Puzzle games online.</p>
+			<a href="mailto:your-email@example.com" class="text-amber-400 hover:text-amber-300 transition-colors flex items-center gap-1.5 font-medium text-sm">
+				<i class="fa-solid fa-envelope"></i> Contact Us: your-email@example.com
+			</a>
+		</footer>
     </div>
 
     <!-- JavaScript Data & Logic -->
@@ -155,11 +161,11 @@
             {
                 id: 1,
                 title: "Break the Code",
-                category: "puzzle",
+                category: ["online", "puzzle"],
                 url: "https://lst-2k.github.io/mastermind/",
                 image: "BreaktheCode.jfif",
                 fallbackImage: "input_file_0.png",
-                badge: "Decrypt Pattern, Online Multiplayer",
+                badge: "Decrypt Pattern",
                 rating: "4.9",
                 fallbackText: "Break The Code"
             },
@@ -177,22 +183,22 @@
             {
                 id: 3,
                 title: "Chase the Ace",
-                category: "solitaire",
+                category: "online",
                 url: "https://lst-2k.github.io/chasetheace/",
                 image: "ChasetheAce.jfif",
                 fallbackImage: "input_file_2.png",
-                badge: "Dodge the Ace, Online Multiplayer",
-                rating: "4.7",
+                badge: "Online Multiplayer",
+                rating: "5.0",
                 fallbackText: "Chase The Ace"
             },
             {
                 id: 4,
                 title: "Chess & Draughts",
-                category: "strategy",
+                category: ["online", "strategy"],
                 url: "https://lst-2k.github.io/chessgame/",
                 image: "ChessDraughts.jfif",
                 fallbackImage: "input_file_3.png",
-                badge: "Strategy Battle, Online Multiplayer",
+                badge: "Strategy Battle",
                 rating: "5.0",
                 fallbackText: "Chess & Draughts"
             },
@@ -291,7 +297,7 @@
                 url: "https://lst-2k.github.io/tablesolitaire/",
                 image: "Spider.jfif",
                 fallbackImage: "input_file_1.png",
-                badge: "8 Suits Challenge",
+                badge: "4 Suits Challenge",
                 rating: "4.9",
                 fallbackText: "Spider Solitaire"
             },
@@ -317,7 +323,7 @@
                 rating: "4.7",
                 fallbackText: "Tile Slide"
             },
-			{
+            {
                 id: 16,
                 title: "Colour Match",
                 category: "puzzle",
@@ -328,21 +334,21 @@
                 rating: "4.9",
                 fallbackText: "Colour Match"
             },
-			{
+            {
                 id: 17,
                 title: "Roll the Dice",
-                category: "strategy",
+                category: ["online", "strategy"],
                 url: "https://lst-2k.github.io/dicegames/",
                 image: "RolltheDice.jfif",
                 fallbackImage: "input_file_1.png",
-                badge: "Dice Roll, Online Multiplayer",
+                badge: "Dice Roll",
                 rating: "4.8",
                 fallbackText: "RolltheDice"
             },
-			{
-                id: 17,
+            {
+                id: 18,
                 title: "Shut the Box",
-                category: "strategy",
+                category: ["online", "strategy"],
                 url: "https://lst-2k.github.io/dicegames/",
                 image: "ShuttheBox.jfif",
                 fallbackImage: "input_file_1.png",
@@ -350,17 +356,17 @@
                 rating: "4.8",
                 fallbackText: "ShuttheBox"
             },
-			{
-                id: 18,
+            {
+                id: 19,
                 title: "Mancala",
-                category: "strategy",
+                category: ["online", "strategy"],
                 url: "https://lst-2k.github.io/mancala/",
                 image: "mancala.jfif",
                 fallbackImage: "input_file_1.png",
-                badge: "Classic favourite, Online Multiplayer",
+                badge: "Classic favourite",
                 rating: "4.8",
                 fallbackText: "Mancala"
-            },
+            }
         ];
 
         let currentCategory = 'all';
@@ -405,11 +411,12 @@
                                 </div>
                             </div>
 
-                            <!-- Category & Badge Line (Side-by-side above Play Now button) -->
+                            <!-- Category & Badge Line -->
                             <div class="flex items-center justify-between mb-4">
                                 <span class="text-xs text-emerald-300/80 capitalize flex items-center">
-                                    <i class="fa-solid fa-tag mr-1.5 text-amber-500/80"></i>${game.category}
-                                </span>
+									<i class="fa-solid fa-tag mr-1.5 text-amber-500/80"></i>
+									${Array.isArray(game.category) ? game.category.join(', ') : game.category}
+								</span>
                                 <span class="bg-black/60 text-amber-400 text-[11px] font-bold px-2.5 py-0.5 rounded-md border border-amber-500/40 shadow-sm">
                                     ${game.badge}
                                 </span>
@@ -441,16 +448,18 @@
         }
 
         function applyFilters() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+			const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
 
-            const filtered = games.filter(game => {
-                const matchesCategory = currentCategory === 'all' || game.category === currentCategory;
-                const matchesSearch = game.title.toLowerCase().includes(searchTerm) || game.badge.toLowerCase().includes(searchTerm);
-                return matchesCategory && matchesSearch;
-            });
+			const filtered = games.filter(game => {
+				const matchesCategory = currentCategory === 'all' || 
+					(Array.isArray(game.category) ? game.category.includes(currentCategory) : game.category === currentCategory);
+					
+				const matchesSearch = game.title.toLowerCase().includes(searchTerm) || game.badge.toLowerCase().includes(searchTerm);
+				return matchesCategory && matchesSearch;
+			});
 
-            renderGames(filtered);
-        }
+			renderGames(filtered);
+		}
 
         // Background Particles
         const canvas = document.getElementById('bgCanvas');
